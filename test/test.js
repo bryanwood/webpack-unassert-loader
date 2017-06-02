@@ -16,5 +16,18 @@ describe('webpack-unassert-loader', function() {
 
     unassert.call(context, source, null);
   });
+
+  it('should return source removed assertions with es module import present', function() {
+    var source = 'import * as example from \'example\';\n/** comment */\nfunction add(a, b) {\n    assert(!isNaN(a));\n    return a + b;\n}';
+
+    // set context for webpack loader
+    var context = { query: { sourceType: 'module' } };
+    context.callback = function(err, result, map) {
+      var expected = 'import * as example from \'example\';\n/** comment */\nfunction add(a, b) {\n    return a + b;\n}';
+      assert.equal(result, expected, 'remove assertions from the source');
+    };
+
+    unassert.call(context, source, null);
+  });
 });
 
